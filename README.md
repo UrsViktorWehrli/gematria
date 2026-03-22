@@ -1,1 +1,1 @@
-# gematria Version 1
+# gematria Version 2 (mit Zahleneingabe)
