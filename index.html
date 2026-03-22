@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gematria – Zahlencode der Wörter</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #e8c355;
+    --gold-light: #f5df8a;
+    --deep: #1e1040;
+    --purple: #2d1f5e;
+    --ink: #251848;
+    --text: #ede5cc;
+    --dim: #a096b8;
+  }
+
+  body {
+    background: linear-gradient(160deg, #2a1860 0%, #1a0f45 50%, #120d35 100%);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 18px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Starfield */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(201,168,76,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 40%, rgba(201,168,76,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 10%, rgba(201,168,76,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 55%, rgba(201,168,76,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 80%, rgba(201,168,76,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 25%, rgba(201,168,76,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 70%, rgba(201,168,76,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 90%, rgba(201,168,76,0.3) 0%, transparent 100%),
+      radial-gradient(2px 2px at 35% 60%, rgba(201,168,76,0.15) 0%, transparent 100%),
+      radial-gradient(2px 2px at 55% 35%, rgba(201,168,76,0.2) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Radial glow center */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(ellipse, rgba(45,31,94,0.6) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 3rem 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .eye-of-god {
+    width: 60px;
+    height: 40px;
+    margin: 0 auto 1.5rem;
+    position: relative;
+  }
+
+  .eye-of-god svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.6));
+  }
+
+  h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 30px rgba(201,168,76,0.4);
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--dim);
+    font-size: 1.15rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Decorative divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+  .divider-symbol {
+    color: var(--gold);
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+
+  /* Input area */
+  .input-section {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 4px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .input-section::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), transparent 50%, rgba(201,168,76,0.05));
+    pointer-events: none;
+  }
+
+  label {
+    display: block;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 3px;
+    padding: 0.85rem 1.2rem;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.25rem;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 15px rgba(201,168,76,0.15);
+  }
+
+  input[type="text"]::placeholder {
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  button {
+    background: linear-gradient(135deg, rgba(201,168,76,0.2), rgba(201,168,76,0.1));
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 3px;
+    color: var(--gold-light);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  button:hover {
+    background: linear-gradient(135deg, rgba(201,168,76,0.35), rgba(201,168,76,0.2));
+    box-shadow: 0 0 20px rgba(201,168,76,0.2);
+    transform: translateY(-1px);
+  }
+
+  button:active { transform: translateY(0); }
+
+  /* Method tabs */
+  .method-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 2px;
+    color: var(--dim);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+  }
+
+  .tab.active, .tab:hover {
+    border-color: var(--gold);
+    color: var(--gold-light);
+    background: rgba(201,168,76,0.08);
+  }
+
+  /* Results */
+  .results {
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .results.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 4px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle at top right, rgba(201,168,76,0.06), transparent);
+    pointer-events: none;
+  }
+
+  .method-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    opacity: 0.8;
+  }
+
+  .letter-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .letter-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 3px;
+    padding: 0.5rem 0.7rem;
+    min-width: 42px;
+  }
+
+  .letter-char {
+    font-size: 1.7rem;
+    color: var(--gold-light);
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+  }
+
+  .letter-val {
+    font-size: 1rem;
+    color: var(--dim);
+  }
+
+  .total-line {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .total-label {
+    font-style: italic;
+    color: var(--dim);
+    font-size: 0.95rem;
+  }
+
+  .total-number {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.5rem;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    line-height: 1;
+  }
+
+
+  .root-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .root-label { font-style: italic; color: var(--dim); font-size: 0.85rem; }
+  .root-number { font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; color: var(--gold-light); opacity: 0.8; }
+  .root-steps { font-size: 0.8rem; color: var(--dim); font-style: italic; }
+
+  .hebrew-display {
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    letter-spacing: 0.1em;
+    direction: rtl;
+    margin-bottom: 0.5rem;
+  }
+
+  /* AI insight */
+  .ai-section {
+    background: rgba(45,31,94,0.5);
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .ai-section .method-name {
+    margin-bottom: 0.75rem;
+  }
+
+  .ai-text {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: var(--text);
+    font-style: italic;
+  }
+
+  .ai-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .dots span {
+    display: inline-block;
+    animation: blink 1.2s infinite;
+    font-size: 1.5rem;
+    line-height: 0;
+    vertical-align: middle;
+  }
+  .dots span:nth-child(2) { animation-delay: 0.2s; }
+  .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes blink {
+    0%, 80%, 100% { opacity: 0.2; }
+    40% { opacity: 1; }
+  }
+
+  /* Error */
+  .error-msg {
+    color: #c06060;
+    font-style: italic;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+
+
+  /* Zahlensuche */
+  .number-search-section {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(232,195,85,0.2);
+    border-radius: 4px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .number-search-result {
+    margin-top: 1.5rem;
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .number-search-result.visible { display: block; }
+
+  .number-hero {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .number-big {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 4rem;
+    color: var(--gold);
+    text-shadow: 0 0 30px rgba(232,195,85,0.5);
+    line-height: 1;
+    display: block;
+  }
+
+  .number-root-display {
+    font-style: italic;
+    color: var(--dim);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .entsprechungen-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  .entsprechung-tag {
+    background: rgba(232,195,85,0.1);
+    border: 1px solid rgba(232,195,85,0.35);
+    border-radius: 20px;
+    padding: 0.5rem 1.1rem;
+    font-size: 1.15rem;
+    color: var(--gold-light);
+  }
+
+  .keine-entsprechung {
+    font-style: italic;
+    color: var(--dim);
+    font-size: 1.15rem;
+  }
+
+  .number-section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    opacity: 0.8;
+  }
+
+  .number-block {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(232,195,85,0.1);
+    border-radius: 3px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Compare section */
+  .compare-section {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(232,195,85,0.2);
+    border-radius: 4px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .compare-result {
+    margin-top: 1.5rem;
+    display: none;
+    animation: fadeUp 0.5s ease;
+  }
+
+  .compare-result.visible { display: block; }
+
+  .compare-match {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+
+  .compare-match.gleich {
+    background: rgba(100,200,100,0.1);
+    border: 1px solid rgba(100,200,100,0.3);
+  }
+
+  .compare-match.verschieden {
+    background: rgba(200,150,50,0.08);
+    border: 1px solid rgba(200,150,50,0.2);
+  }
+
+  .compare-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+
+  .compare-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+  }
+
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .compare-word-box {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(232,195,85,0.15);
+    border-radius: 3px;
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .compare-word-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .compare-word-vals {
+    font-size: 1.1rem;
+    color: var(--dim);
+    line-height: 1.8;
+  }
+
+  .compare-vs {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.7rem;
+    color: var(--dim);
+    text-align: center;
+    letter-spacing: 0.1em;
+  }
+
+  .match-badge {
+    display: inline-block;
+    background: rgba(100,200,100,0.15);
+    border: 1px solid rgba(100,200,100,0.4);
+    border-radius: 20px;
+    padding: 0.3rem 1rem;
+    font-size: 1.05rem;
+    color: #90d090;
+    margin: 0.2rem;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: var(--dim);
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <!-- Eye of Providence SVG -->
+    <div class="eye-of-god">
+      <svg viewBox="0 0 100 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="32" rx="45" ry="28" stroke="#c9a84c" stroke-width="1.5" opacity="0.6"/>
+        <ellipse cx="50" cy="32" rx="45" ry="28" fill="none" stroke="url(#glow)" stroke-width="0.5"/>
+        <circle cx="50" cy="32" r="12" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.8"/>
+        <circle cx="50" cy="32" r="5" fill="#c9a84c" opacity="0.7"/>
+        <circle cx="47" cy="29" r="2" fill="#e8c97a" opacity="0.5"/>
+        <!-- lashes -->
+        <line x1="50" y1="4" x2="50" y2="12" stroke="#c9a84c" stroke-width="1" opacity="0.4"/>
+        <line x1="30" y1="8" x2="34" y2="15" stroke="#c9a84c" stroke-width="1" opacity="0.3"/>
+        <line x1="70" y1="8" x2="66" y2="15" stroke="#c9a84c" stroke-width="1" opacity="0.3"/>
+        <defs>
+          <linearGradient id="glow" x1="0" y1="0" x2="100" y2="0">
+            <stop offset="0%" stop-color="#c9a84c" stop-opacity="0"/>
+            <stop offset="50%" stop-color="#c9a84c" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h1>Gematria</h1>
+    <p class="subtitle">Der Zahlencode verborgener Wörter</p>
+  </header>
+
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+
+  <div class="input-section">
+    <label>Wort oder Satz eingeben</label>
+    <div class="input-row">
+      <input type="text" id="wordInput" placeholder="z. B. Graphene, Liebe, Basel …" />
+      <button onclick="calculate()">Berechnen</button>
+    </div>
+    <div id="errorMsg" class="error-msg" style="display:none"></div>
+  </div>
+
+  <div id="results" class="results">
+
+    <!-- English Gematria -->
+    <div class="result-card" id="card-en">
+      <div class="method-name">✦ Englische Gematria (A=1 … Z=26)</div>
+      <div class="letter-breakdown" id="breakdown-en"></div>
+      <div class="total-line">
+        <span class="total-label">Zahlenwert:</span>
+        <span class="total-number" id="total-en"></span>
+      </div>
+      <div class="root-line">
+        <span class="root-label">Wurzelzahl:</span>
+        <span class="root-number" id="root-en"></span>
+        <span class="root-steps" id="root-steps-en"></span>
+      </div>
+    </div>
+
+    <!-- Hebrew -->
+    <div class="result-card" id="card-he">
+      <div class="method-name">✦ Hebräische Gematria (Umschrift)</div>
+      <div class="hebrew-display" id="hebrew-word"></div>
+      <div class="letter-breakdown" id="breakdown-he"></div>
+      <div class="total-line">
+        <span class="total-label">Zahlenwert:</span>
+        <span class="total-number" id="total-he"></span>
+      </div>
+      <div class="root-line">
+        <span class="root-label">Wurzelzahl:</span>
+        <span class="root-number" id="root-he"></span>
+        <span class="root-steps" id="root-steps-he"></span>
+      </div>
+    </div>
+
+    <!-- Greek -->
+    <div class="result-card" id="card-gr">
+      <div class="method-name">✦ Griechische Isopsephy</div>
+      <div class="letter-breakdown" id="breakdown-gr"></div>
+      <div class="total-line">
+        <span class="total-label">Zahlenwert:</span>
+        <span class="total-number" id="total-gr"></span>
+      </div>
+      <div class="root-line">
+        <span class="root-label">Wurzelzahl:</span>
+        <span class="root-number" id="root-gr"></span>
+        <span class="root-steps" id="root-steps-gr"></span>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-symbol">✦</span></div>
+
+    <!-- AI Insight -->
+    <div class="ai-section">
+      <div class="method-name">✦ Kabbalistische Deutung</div>
+      <div id="aiInsight" class="ai-text">
+        <div class="ai-loading">
+          Weise Geister befragen<span class="dots"><span>.</span><span>.</span><span>.</span></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+
+  <!-- Zahlensuche -->
+  <div class="number-search-section">
+    <label>✦ Zahlensuche — Wörter zu einem Wert</label>
+    <div style="display:flex; gap:0.75rem; margin-top:0.75rem;">
+      <input type="number" id="numberInput" placeholder="z. B. 666, 777, 26 …"
+        style="flex:1;" min="1" max="9999" />
+      <button onclick="searchByNumber()">Suchen</button>
+    </div>
+    <div id="numberSearchResult" class="number-search-result"></div>
+  </div>
+
+  <div class="divider"><span class="divider-symbol">✦</span></div>
+
+  <!-- Vergleichsfunktion -->
+  <div class="compare-section">
+    <label>✦ Zwei Wörter vergleichen</label>
+    <div style="display:flex; gap:0.75rem; flex-wrap:wrap; margin-top:0.75rem;">
+      <input type="text" id="compareA" placeholder="Erstes Wort…" style="flex:1; min-width:120px;" />
+      <input type="text" id="compareB" placeholder="Zweites Wort…" style="flex:1; min-width:120px;" />
+      <button onclick="compareWords()">Vergleichen</button>
+    </div>
+    <div id="compareResult" class="compare-result"></div>
+  </div>
+
+  <footer>
+    In Zahlen liegt das Wesen aller Dinge — Pythagoras
+  </footer>
+
+</div>
+
+<script>
+// ─── English Gematria ───────────────────────────────────────────────────────
+function englishGematria(word) {
+  const clean = word.toUpperCase().replace(/[^A-Z]/g, '');
+  let total = 0;
+  const cells = [];
+  for (const ch of clean) {
+    const val = ch.charCodeAt(0) - 64;
+    total += val;
+    cells.push({ char: ch, val });
+  }
+  return { total, cells };
+}
+
+// ─── Hebrew transliteration map ────────────────────────────────────────────
+const hebrewMap = {
+  'A': { heb: 'א', val: 1 },  'B': { heb: 'ב', val: 2 },
+  'G': { heb: 'ג', val: 3 },  'D': { heb: 'ד', val: 4 },
+  'H': { heb: 'ה', val: 5 },  'V': { heb: 'ו', val: 6 },
+  'Z': { heb: 'ז', val: 7 },  'X': { heb: 'ח', val: 8 },
+  'T': { heb: 'ט', val: 9 },  'Y': { heb: 'י', val: 10 },
+  'K': { heb: 'כ', val: 20 }, 'L': { heb: 'ל', val: 30 },
+  'M': { heb: 'מ', val: 40 }, 'N': { heb: 'נ', val: 50 },
+  'S': { heb: 'ס', val: 60 }, 'O': { heb: 'ע', val: 70 },
+  'P': { heb: 'פ', val: 80 }, 'Q': { heb: 'צ', val: 90 },
+  'R': { heb: 'ר', val: 200 },'W': { heb: 'ש', val: 300 },
+  'F': { heb: 'ת', val: 400 },
+  // fallbacks for unmapped letters
+  'C': { heb: 'כ', val: 20 }, 'E': { heb: 'ה', val: 5 },
+  'I': { heb: 'י', val: 10 }, 'J': { heb: 'י', val: 10 },
+  'U': { heb: 'ו', val: 6 },
+};
+
+function hebrewGematria(word) {
+  const clean = word.toUpperCase().replace(/[^A-Z]/g, '');
+  let total = 0;
+  const cells = [];
+  let hebrewWord = '';
+  for (const ch of clean) {
+    const entry = hebrewMap[ch] || { heb: ch, val: 0 };
+    total += entry.val;
+    hebrewWord += entry.heb;
+    cells.push({ char: entry.heb, val: entry.val, orig: ch });
+  }
+  return { total, cells, hebrewWord };
+}
+
+// ─── Greek Isopsephy ────────────────────────────────────────────────────────
+const greekMap = {
+  'A': { gk: 'Α', val: 1 },  'B': { gk: 'Β', val: 2 },
+  'G': { gk: 'Γ', val: 3 },  'D': { gk: 'Δ', val: 4 },
+  'E': { gk: 'Ε', val: 5 },  'Z': { gk: 'Ζ', val: 7 },
+  'H': { gk: 'Η', val: 8 },  'T': { gk: 'Θ', val: 9 },
+  'I': { gk: 'Ι', val: 10 }, 'K': { gk: 'Κ', val: 20 },
+  'L': { gk: 'Λ', val: 30 }, 'M': { gk: 'Μ', val: 40 },
+  'N': { gk: 'Ν', val: 50 }, 'X': { gk: 'Ξ', val: 60 },
+  'O': { gk: 'Ο', val: 70 }, 'P': { gk: 'Π', val: 80 },
+  'R': { gk: 'Ρ', val: 100 },'S': { gk: 'Σ', val: 200 },
+  'U': { gk: 'Υ', val: 400 },'F': { gk: 'Φ', val: 500 },
+  'C': { gk: 'Χ', val: 600 },'Y': { gk: 'Ψ', val: 700 },
+  'W': { gk: 'Ω', val: 800 },
+  // fallbacks
+  'J': { gk: 'Ι', val: 10 }, 'Q': { gk: 'Κ', val: 20 },
+  'V': { gk: 'Β', val: 2 },
+};
+
+function greekIsopsephy(word) {
+  const clean = word.toUpperCase().replace(/[^A-Z]/g, '');
+  let total = 0;
+  const cells = [];
+  for (const ch of clean) {
+    const entry = greekMap[ch] || { gk: ch, val: 0 };
+    total += entry.val;
+    cells.push({ char: entry.gk, val: entry.val, orig: ch });
+  }
+  return { total, cells };
+}
+
+
+// ─── Theosophic Reduction (Wurzelzahl) ──────────────────────────────────────
+function reduceToRoot(n) {
+  // Master numbers 11, 22, 33 are kept in some traditions
+  const steps = [n];
+  while (n > 9) {
+    n = String(n).split('').reduce((a, d) => a + parseInt(d), 0);
+    steps.push(n);
+  }
+  return { root: n, steps };
+}
+
+function showRoot(prefix, total) {
+  const { root, steps } = reduceToRoot(total);
+  document.getElementById('root-' + prefix).textContent = root;
+  if (steps.length > 1) {
+    const chain = steps.join(' → ');
+    document.getElementById('root-steps-' + prefix).textContent = '(' + chain + ')';
+  } else {
+    document.getElementById('root-steps-' + prefix).textContent = '';
+  }
+}
+
+// ─── Render helpers ─────────────────────────────────────────────────────────
+function renderCells(containerId, cells) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = cells.map(c =>
+    `<div class="letter-cell">
+      <span class="letter-char">${c.char}</span>
+      <span class="letter-val">${c.val}</span>
+    </div>`
+  ).join('');
+}
+
+// ─── Main calculate ──────────────────────────────────────────────────────────
+async function calculate() {
+  const word = document.getElementById('wordInput').value.trim();
+  const errEl = document.getElementById('errorMsg');
+
+  if (!word) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'Bitte ein Wort eingeben.';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const results = document.getElementById('results');
+  results.classList.add('visible');
+
+  // English
+  const en = englishGematria(word);
+  renderCells('breakdown-en', en.cells);
+  document.getElementById('total-en').textContent = en.total;
+  showRoot('en', en.total);
+
+  // Hebrew
+  const he = hebrewGematria(word);
+  document.getElementById('hebrew-word').textContent = he.hebrewWord;
+  renderCells('breakdown-he', he.cells);
+  document.getElementById('total-he').textContent = he.total;
+  showRoot('he', he.total);
+
+  // Greek
+  const gr = greekIsopsephy(word);
+  renderCells('breakdown-gr', gr.cells);
+  document.getElementById('total-gr').textContent = gr.total;
+  showRoot('gr', gr.total);
+
+  // AI Insight
+  document.getElementById('aiInsight').innerHTML =
+    `<div class="ai-loading">Weise Geister befragen<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>`;
+
+  await fetchAiInsight(word, en.total, he.total, gr.total);
+}
+
+// Enter key
+document.getElementById('wordInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') calculate();
+});
+
+// ─── Eingebaute Kabbalistische Deutungs-Engine ────────────────────────────────
+
+const WURZEL_BEDEUTUNGEN = {
+  1: { name: "Einheit / Alef", archetypus: "Der Ursprung, das Göttliche Eine, der ungeteilte Wille", energie: "Schöpfung, Führung, Neubeginn" },
+  2: { name: "Dualität / Bet", archetypus: "Die Polarität, Licht und Schatten, Himmel und Erde", energie: "Balance, Partnerschaft, Reflexion" },
+  3: { name: "Dreifaltigkeit / Gimel", archetypus: "Die schöpferische Synthese, Körper-Seele-Geist", energie: "Ausdruck, Kreativität, Wachstum" },
+  4: { name: "Manifestation / Dalet", archetypus: "Die vier Welten, das Fundament der Materie", energie: "Ordnung, Struktur, Beständigkeit" },
+  5: { name: "Wandel / He", archetypus: "Die fünf Sinne, der Atem Gottes (He im Gottesnamen)", energie: "Freiheit, Transformation, Abenteuer" },
+  6: { name: "Harmonie / Vav", archetypus: "Der Verbinder, die sechs Richtungen des Raumes", energie: "Liebe, Schönheit, Gleichgewicht" },
+  7: { name: "Vollendung / Zayin", archetypus: "Der heilige Sabbat, die sieben Sphären", energie: "Spiritualität, Weisheit, innere Suche" },
+  8: { name: "Unendlichkeit / Chet", archetypus: "Das liegende Acht, Tod und Wiedergeburt", energie: "Macht, Fülle, kosmischer Kreislauf" },
+  9: { name: "Vollkommenheit / Tet", archetypus: "Die höchste Einzelziffer, das Ende eines Zyklus", energie: "Weisheit, Vollendung, Mitgefühl" }
+};
+
+const ZAHLEN_RESONANZ = {
+  // Besondere Zahlen der Kabbala
+  10: "Die Zehn Sephiroth des Lebensbaums — Vollständigkeit der göttlichen Emanationen.",
+  11: "Meisterzahl: Intuition und spirituelle Erleuchtung jenseits des gewöhnlichen Verstandes.",
+  12: "Die zwölf Stämme Israels, die zwölf Zeichen des Tierkreises — kosmische Ordnung.",
+  13: "אהבה (Ahava, Liebe) = 13, אחד (Echad, Einheit) = 13 — Liebe ist Einheit.",
+  14: "Davids Stern (6+8), Übergang und Erlösung.",
+  18: "חי (Chai, Leben) = 18 — die heilige Zahl des Lebens im Judentum.",
+  22: "Meisterzahl: Die 22 Buchstaben des hebräischen Alphabets, Baustein der Schöpfung.",
+  26: "יהוה (JHWH, Gottesname) = 26 — die Schwingung des Tetragrammatons.",
+  33: "Meisterzahl: Christusbewusstsein, der Meisterlehrer.",
+  36: "Die 36 verborgenen Gerechten (Lamed-Vav Tzaddikim), die die Welt tragen.",
+  40: "Die vierzig Jahre in der Wüste, vierzig Tage der Prüfung — Transformation.",
+  44: "Doppelte Manifestation, Engel der Veränderung.",
+  49: "Sieben mal Sieben — Vollendung der Vollendung, Vorabend der Erleuchtung.",
+  50: "Das Jubeljahr, Nun (Fisch) — Befreiung und Erneuerung.",
+  55: "Meisterzahl der Wandlung — alte Muster lösen sich auf.",
+  66: "Spiegelzahl der Harmonie — das Materielle im Gleichklang.",
+  72: "Die 72 Namen Gottes aus Exodus — Schutz und göttliche Kraft.",
+  77: "Doppeltes Geheimnis — Verbindung zweier Welten.",
+  99: "Die Vollendung vor der Transzendenz — ein Zyklus schliesst sich.",
+  100: "Kof — der Hinterkopf, das Unbewusste, spirituelle Kraft.",
+  111: "Alef in voller Entfaltung — reine göttliche Energie.",
+  144: "12×12 — kosmische Vollständigkeit, die Zahl der Auserwählten.",
+  216: "6×6×6 — aber auch die Zahl der Buchstaben im dreifachen Gottesnamen.",
+  333: "Die Hälfte von 666 — Schwelle zwischen den Welten, Choronzon.",
+  360: "Der vollständige Kreis — Vollendung eines kosmischen Zyklus.",
+  400: "Tav — der letzte Buchstabe, das Siegel, das Ende und der Anfang.",
+  666: "Die Zahl des Menschen (6) in dreifacher Potenz — Materie ohne Geist.",
+  777: "Vollendung auf allen drei Ebenen: Körper, Seele, Geist.",
+  888: "Iesous (Jesus) auf Griechisch = 888 — Überwindung der 7, neue Schöpfung.",
+};
+
+const BEKANNTE_ENTSPRECHUNGEN = {
+  // Englische Gematria (A=1..Z=26)
+  13:  ["Liebe (אהבה, hebr.)", "Einheit (אחד, hebr.)"],
+  14:  ["David (engl.)"],
+  18:  ["Leben (חי, hebr.)", "Chai"],
+  26:  ["JHWH (יהוה)", "God (engl.)"],
+  33:  ["Amen (engl.)", "Bibel (engl.)"],
+  36:  ["Emet / Wahrheit (אמת, hebr.)"],
+  38:  ["Death (engl.)"],
+  40:  ["Moses (engl.)"],
+  43:  ["Evil (engl.)"],
+  52:  ["Devil (engl.)"],
+  58:  ["Freemasonry (Quersumme)"],
+  59:  ["Negro (engl.) — historisch belastet"],
+  60:  ["Order (engl.)"],
+  66:  ["Woman (engl.)"],
+  67:  ["Satanic (engl.)"],
+  69:  ["Cancer (engl., Sternzeichen)"],
+  72:  ["Hesed / Gnade (חסד, hebr.)", "Names of God (72 Gottesnamen)"],
+  74:  ["Jesus (engl.)", "Lucifer (engl.)", "Occult (engl.)", "Energy (engl.)", "Cross (engl.)"],
+  77:  ["Christ (engl.)", "Positive (engl.)"],
+  78:  ["Tarot (engl.) — 78 Karten"],
+  80:  ["Yesod (יסוד, Fundament)"],
+  86:  ["Elohim (אלהים, hebr.)"],
+  91:  ["Amen (אמן, hebr.)", "Malkuth (מלכות)"],
+  99:  ["Thirteen (engl.)"],
+  100: ["Keter / Krone (כתר, hebr.)"],
+  111: ["Alef (אלף, hebr.)"],
+  112: ["Hashem (השם, Der Name)"],
+  120: ["Sandalphon (Engel)"],
+  130: ["Sinai (סיני, hebr.)"],
+  144: ["Twelve Tribes (engl.)", "Gevurah (גבורה, Stärke)"],
+  153: ["Fische im Netz (Johannes 21)"],
+  216: ["Gevurah (גבורה) × 3", "216 Buchstaben im Gottesnamen"],
+  231: ["Tore des Sefer Yetzirah"],
+  248: ["Abraham (אברהם, hebr.)", "Gebote (positive Mizwot)"],
+  270: ["Ruach (רוח, Geist/Wind)"],
+  300: ["Shin (שׁ) — Feuer, göttlicher Atem"],
+  314: ["Shaddai (שדי, Allmächtiger)"],
+  333: ["Choronzon (Dämon der Schwelle)"],
+  345: ["Moses (משה, hebr.)"],
+  358: ["Mashiach (משיח, Messias)", "Nachash (נחש, Schlange)"],
+  400: ["Tav (תו) — letzter Buchstabe"],
+  434: ["Dalet (דלת, hebr.)"],
+  440: ["Yeshua (ישוע, hebr.)"],
+  541: ["Israel (ישראל, hebr.)"],
+  600: ["Mem Sofit (ם) — Wasser, Weisheit"],
+  611: ["Torah (תורה, hebr.)"],
+  666: ["Sorath (Sonnen-Dämon)", "Tier der Offenbarung", "Nero Caesar (hebr.)"],
+  777: ["Vollendung aller Ebenen", "OZ (עז, Stärke) × Vollendung"],
+  888: ["Iesous (Ιησούς, griech.)", "Jesus in Griechisch"],
+  913: ["Bereshit (בראשית, Im Anfang)"],
+  999: ["Abschluss des Zyklus"],
+  1000: ["Alef (אלף) in voller Kraft"],
+};
+
+function generiereKabbalistischeDeutung(wort, enVal, heVal, grVal) {
+  const { root: enRoot, steps: enSteps } = reduceToRoot(enVal);
+  const { root: heRoot } = reduceToRoot(heVal);
+  const { root: grRoot } = reduceToRoot(grVal);
+
+  const wurzel = WURZEL_BEDEUTUNGEN[enRoot] || WURZEL_BEDEUTUNGEN[9];
+  
+  // Besondere Zahlenresonanz sammeln
+  const resonanzen = [];
+  [enVal, heVal, grVal].forEach(val => {
+    if (ZAHLEN_RESONANZ[val]) resonanzen.push(`${val}: ${ZAHLEN_RESONANZ[val]}`);
+  });
+
+  // Bekannte Entsprechungen
+  const entsprechungen = [];
+  [enVal, heVal, grVal].forEach(val => {
+    if (BEKANNTE_ENTSPRECHUNGEN[val]) {
+      entsprechungen.push(`teilt den Wert ${val} mit: ${BEKANNTE_ENTSPRECHUNGEN[val].join(', ')}`);
+    }
+  });
+
+  // Deutung aufbauen
+  let text = `<strong>Wurzelzahl ${enRoot} — ${wurzel.name}</strong><br><br>`;
+  
+  text += `„${wort}" trägt die Schwingung der ${enRoot}, des Archetypus von <em>${wurzel.archetypus}</em>. `;
+  text += `Ihre Energie fliesst durch die Kanäle von <em>${wurzel.energie}</em>.<br><br>`;
+
+  if (resonanzen.length > 0) {
+    text += `✦ <em>${resonanzen[0]}</em><br><br>`;
+  }
+
+  if (entsprechungen.length > 0) {
+    text += `Das Wort ${entsprechungen.join('; ')}.<br><br>`;
+  }
+
+  // Dreifache Harmonie
+  if (enRoot === heRoot && heRoot === grRoot) {
+    text += `✦ Bemerkenswert: Alle drei Traditionen reduzieren sich auf die <strong>${enRoot}</strong> — ein seltenes Zeichen tiefer kosmischer Kohärenz.`;
+  } else if (enRoot === heRoot || enRoot === grRoot || heRoot === grRoot) {
+    text += `✦ Zwei der drei Traditionen stimmen in der Wurzel überein — das Wort trägt eine verborgene Einheit in sich.`;
+  } else {
+    text += `✦ Die drei Traditionen zeigen verschiedene Facetten: ${enRoot} (englisch), ${heRoot} (hebräisch), ${grRoot} (griechisch) — ein vielschichtiges Wesen.`;
+  }
+
+  return text;
+}
+
+
+// ─── Deutung anzeigen (offline, eingebaut) ───────────────────────────────────
+async function fetchAiInsight(word, enVal, heVal, grVal) {
+  // Kurze künstliche Pause für mystischen Effekt
+  await new Promise(r => setTimeout(r, 800));
+  const text = generiereKabbalistischeDeutung(word, enVal, heVal, grVal);
+  document.getElementById('aiInsight').innerHTML =
+    `<div class="ai-text">${text}</div>`;
+}
+
+
+// ─── Zahlensuche ─────────────────────────────────────────────────────────────
+function searchByNumber() {
+  const val = parseInt(document.getElementById('numberInput').value);
+  const resultEl = document.getElementById('numberSearchResult');
+
+  if (!val || val < 1) {
+    resultEl.innerHTML = '<p class="keine-entsprechung">Bitte eine gültige Zahl eingeben.</p>';
+    resultEl.classList.add('visible');
+    return;
+  }
+
+  const { root, steps } = reduceToRoot(val);
+  const wurzel = WURZEL_BEDEUTUNGEN[root] || WURZEL_BEDEUTUNGEN[9];
+  const resonanz = ZAHLEN_RESONANZ[val];
+  const entsprechungen = BEKANNTE_ENTSPRECHUNGEN[val] || [];
+
+  // Auch prüfen ob Zahl als Wurzelzahl anderer Einträge auftaucht
+  const gleicheWurzel = [];
+  Object.entries(BEKANNTE_ENTSPRECHUNGEN).forEach(([k, v]) => {
+    const { root: r } = reduceToRoot(parseInt(k));
+    if (r === root && parseInt(k) !== val) {
+      v.forEach(w => gleicheWurzel.push(`${w} (${k})`));
+    }
+  });
+
+  let html = `<div class="number-hero">
+    <span class="number-big">${val}</span>
+    <div class="number-root-display">
+      Wurzelzahl: <strong>${root}</strong>
+      ${steps.length > 1 ? ' (' + steps.join(' → ') + ')' : ''}
+    </div>
+  </div>`;
+
+  // Archetypus
+  html += `<div class="number-block">
+    <div class="number-section-title">Archetypus</div>
+    <div style="font-style:italic; color:var(--text); font-size:1.15rem">${wurzel.name} — ${wurzel.archetypus}</div>
+    <div style="color:var(--dim); font-size:1.05rem; margin-top:0.4rem">${wurzel.energie}</div>
+  </div>`;
+
+  // Besondere Resonanz
+  if (resonanz) {
+    html += `<div class="number-block">
+      <div class="number-section-title">Kabbalistische Bedeutung</div>
+      <div style="color:var(--text); font-size:1.15rem">${resonanz}</div>
+    </div>`;
+  }
+
+  // Direkte Entsprechungen
+  if (entsprechungen.length > 0) {
+    html += `<div class="number-block">
+      <div class="number-section-title">Wörter mit diesem Wert</div>
+      <div class="entsprechungen-grid">
+        ${entsprechungen.map(e => `<span class="entsprechung-tag">${e}</span>`).join('')}
+      </div>
+    </div>`;
+  } else {
+    html += `<div class="number-block">
+      <div class="number-section-title">Wörter mit diesem Wert</div>
+      <div class="keine-entsprechung">Keine bekannten Entsprechungen in der Datenbank — gib oben ein Wort ein und berechne es!</div>
+    </div>`;
+  }
+
+  // Gleiche Wurzelzahl
+  if (gleicheWurzel.length > 0) {
+    html += `<div class="number-block">
+      <div class="number-section-title">Gleiche Wurzelzahl ${root}</div>
+      <div class="entsprechungen-grid">
+        ${gleicheWurzel.map(e => `<span class="entsprechung-tag" style="opacity:0.7">${e}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  resultEl.innerHTML = html;
+  resultEl.classList.add('visible');
+}
+
+document.getElementById('numberInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') searchByNumber();
+});
+
+// ─── Vergleichsfunktion ──────────────────────────────────────────────────────
+function compareWords() {
+  const a = document.getElementById('compareA').value.trim();
+  const b = document.getElementById('compareB').value.trim();
+  const resultEl = document.getElementById('compareResult');
+
+  if (!a || !b) {
+    resultEl.innerHTML = '<p style="color:var(--dim); font-style:italic">Bitte beide Felder ausfüllen.</p>';
+    resultEl.classList.add('visible');
+    return;
+  }
+
+  const enA = englishGematria(a).total;
+  const enB = englishGematria(b).total;
+  const heA = hebrewGematria(a).total;
+  const heB = hebrewGematria(b).total;
+  const grA = greekIsopsephy(a).total;
+  const grB = greekIsopsephy(b).total;
+
+  const { root: rEnA } = reduceToRoot(enA);
+  const { root: rEnB } = reduceToRoot(enB);
+
+  const matches = [];
+  if (enA === enB) matches.push('Englische Gematria (' + enA + ')');
+  if (heA === heB) matches.push('Hebräische Gematria (' + heA + ')');
+  if (grA === grB) matches.push('Griechische Isopsephy (' + grA + ')');
+  if (rEnA === rEnB) matches.push('Wurzelzahl (' + rEnA + ')');
+
+  const istGleich = matches.length > 0;
+
+  let html = '';
+
+  if (istGleich) {
+    html += `<div class="compare-match gleich">
+      <div class="compare-icon">✦</div>
+      <div class="compare-title" style="color:#90d090">RESONANZ GEFUNDEN</div>
+      <div style="font-style:italic; color:var(--text); font-size:1.1rem; margin-bottom:0.75rem">
+        „${a}" und „${b}" teilen dieselbe Schwingung in:
+      </div>
+      <div>${matches.map(m => `<span class="match-badge">${m}</span>`).join('')}</div>
+    </div>`;
+  } else {
+    html += `<div class="compare-match verschieden">
+      <div class="compare-icon" style="opacity:0.5">◇</div>
+      <div class="compare-title" style="color:var(--gold)">VERSCHIEDENE SCHWINGUNGEN</div>
+      <div style="font-style:italic; color:var(--dim); font-size:1.1rem">
+        „${a}" und „${b}" tragen unterschiedliche Zahlenwerte — doch auch Gegensätze ergänzen sich im grossen Ganzen.
+      </div>
+    </div>`;
+  }
+
+  html += `<div class="compare-grid">
+    <div class="compare-word-box">
+      <div class="compare-word-name">${a.toUpperCase()}</div>
+      <div class="compare-word-vals">
+        Englisch: <strong>${enA}</strong><br>
+        Hebräisch: <strong>${heA}</strong><br>
+        Griechisch: <strong>${grA}</strong><br>
+        Wurzel: <strong>${rEnA}</strong>
+      </div>
+    </div>
+    <div class="compare-vs">VS</div>
+    <div class="compare-word-box">
+      <div class="compare-word-name">${b.toUpperCase()}</div>
+      <div class="compare-word-vals">
+        Englisch: <strong>${enB}</strong><br>
+        Hebräisch: <strong>${heB}</strong><br>
+        Griechisch: <strong>${grB}</strong><br>
+        Wurzel: <strong>${rEnB}</strong>
+      </div>
+    </div>
+  </div>`;
+
+  resultEl.innerHTML = html;
+  resultEl.classList.add('visible');
+}
+
+// Enter key für Vergleich
+document.getElementById('compareA').addEventListener('keydown', e => { if (e.key === 'Enter') compareWords(); });
+document.getElementById('compareB').addEventListener('keydown', e => { if (e.key === 'Enter') compareWords(); });
+
+</script>
+</body>
+</html>
